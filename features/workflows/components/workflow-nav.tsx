@@ -1,6 +1,8 @@
 "use client"
 
 import { useCallback, useTransition } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import type { Workflow } from "@/lib/db/schema"
 import { generateSlug } from "@/features/workflows/lib/generate-slug"
@@ -32,6 +34,7 @@ export function WorkflowNav({
 }) {
   const [isPending, startTransition] = useTransition()
   const { state } = useSidebar()
+  const pathname = usePathname()
 
   const handleCreate = useCallback(() => {
     startTransition(() => {
@@ -53,13 +56,19 @@ export function WorkflowNav({
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            {workflows.map((workflow) => (
-              <SidebarMenuItem key={workflow.id}>
-                <SidebarMenuButton>
-                  <span>{workflow.name}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {workflows.map((workflow) => {
+              const href = `/workflows/${workflow.id}`
+              const isActive = pathname === href
+              return (
+                <SidebarMenuItem key={workflow.id}>
+                  <SidebarMenuButton asChild isActive={isActive}>
+                    <Link href={href}>
+                      <span>{workflow.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -72,7 +81,10 @@ export function WorkflowNav({
         <SidebarMenu>
           <SidebarMenuItem>
             <PopoverTrigger asChild>
-              <SidebarMenuButton tooltip="Workflows">
+              <SidebarMenuButton
+                tooltip="Workflows"
+                isActive={pathname.startsWith("/workflows/")}
+              >
                 <WorkflowIcon />
               </SidebarMenuButton>
             </PopoverTrigger>
@@ -99,15 +111,22 @@ export function WorkflowNav({
             </Button>
           </div>
           <div className="flex flex-col gap-0.5">
-            {workflows.map((workflow) => (
-              <Button
-                key={workflow.id}
-                variant="ghost"
-                className="h-8 w-full justify-start px-2 text-sm font-normal"
-              >
-                {workflow.name}
-              </Button>
-            ))}
+            {workflows.map((workflow) => {
+              const href = `/workflows/${workflow.id}`
+              const isActive = pathname === href
+              return (
+                <Button
+                  key={workflow.id}
+                  variant={isActive ? "secondary" : "ghost"}
+                  className="h-8 w-full justify-start px-2 text-sm font-normal"
+                  asChild
+                >
+                  <Link href={href}>
+                    {workflow.name}
+                  </Link>
+                </Button>
+              )
+            })}
           </div>
         </PopoverContent>
       </Popover>
