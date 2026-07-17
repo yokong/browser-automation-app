@@ -1,9 +1,17 @@
 "use client"
 
+import { useCallback, useTransition } from "react"
+
+import type { Workflow } from "@/lib/db/schema"
+import { generateSlug } from "@/features/workflows/lib/generate-slug"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -15,28 +23,37 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const dummyWorkflows = [
-  { id: "1", name: "Login flow" },
-  { id: "2", name: "Checkout journey" },
-  { id: "3", name: "Onboarding wizard" },
-  { id: "4", name: "Data extraction" },
-  { id: "5", name: "Form filler" },
-]
-
-export function WorkflowNav() {
+export function WorkflowNav({
+  workflows,
+  createWorkflowAction,
+}: {
+  workflows: Workflow[]
+  createWorkflowAction: (name: string) => Promise<void>
+}) {
+  const [isPending, startTransition] = useTransition()
   const { state } = useSidebar()
+
+  const handleCreate = useCallback(() => {
+    startTransition(() => {
+      createWorkflowAction(generateSlug())
+    })
+  }, [createWorkflowAction])
 
   if (state === "expanded") {
     return (
       <SidebarGroup>
         <SidebarGroupLabel>Workflows</SidebarGroupLabel>
-        <SidebarGroupAction title="New workflow">
+        <SidebarGroupAction
+          title="New workflow"
+          onClick={handleCreate}
+          disabled={isPending}
+        >
           <PlusIcon />
           <span className="sr-only">New workflow</span>
         </SidebarGroupAction>
         <SidebarGroupContent>
           <SidebarMenu>
-            {dummyWorkflows.map((workflow) => (
+            {workflows.map((workflow) => (
               <SidebarMenuItem key={workflow.id}>
                 <SidebarMenuButton>
                   <span>{workflow.name}</span>
@@ -71,12 +88,18 @@ export function WorkflowNav() {
             <span className="text-xs font-medium text-muted-foreground">
               Workflows
             </span>
-            <Button variant="ghost" size="icon-sm" aria-label="New workflow">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="New workflow"
+              onClick={handleCreate}
+              disabled={isPending}
+            >
               <PlusIcon />
             </Button>
           </div>
           <div className="flex flex-col gap-0.5">
-            {dummyWorkflows.map((workflow) => (
+            {workflows.map((workflow) => (
               <Button
                 key={workflow.id}
                 variant="ghost"

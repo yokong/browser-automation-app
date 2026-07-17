@@ -1,5 +1,6 @@
 "use client"
 
+import type { Workflow } from "@/lib/db/schema"
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs"
 import { PanelLeftIcon } from "lucide-react"
 
@@ -12,9 +13,15 @@ import {
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { WorkflowNav } from "@/features/workflows/components/workflownav"
+import { WorkflowNav } from "@/features/workflows/components/workflow-nav"
 
-export function AppSidebar() {
+export function AppSidebar({
+  workflows,
+  createWorkflowAction,
+}: {
+  workflows: Workflow[]
+  createWorkflowAction: (name: string) => Promise<void>
+}) {
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -38,7 +45,7 @@ export function AppSidebar() {
         </Button>
       </SidebarHeader>
       <SidebarContent>
-        <WorkflowNav />
+        <WorkflowNav workflows={workflows} createWorkflowAction={createWorkflowAction} />
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter className="items-center">

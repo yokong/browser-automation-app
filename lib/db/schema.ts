@@ -1,13 +1,16 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  clerkId: text("clerk_id").notNull().unique(),
-  email: text("email").notNull().unique(),
-  name: text("name"),
+export const workflows = pgTable("workflows", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: text("org_id").notNull(),
+  name: text("name").notNull(),
+  graph: jsonb("graph"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
 })
+
+// TypeScript type for the workflow table
+export type Workflow = typeof workflows.$inferSelect
