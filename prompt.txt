@@ -1,0 +1,14 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+Add light and dark mode support to the Canvas component by syncing React Flow's color mode with the app theme. Use the useTheme hook from next-themes to read the current theme, and pass it to the ReactFlow colorMode prop so the canvas, edges, and controls switch between liaht and dark along with the rest of the app.
